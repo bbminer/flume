@@ -1,6 +1,8 @@
 package com.min.flume;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.flume.Event;
 import org.apache.flume.EventDeliveryException;
@@ -35,10 +37,30 @@ public class RpcClientFlume {
 		}
 	}
 
+	// 发送header event
+	public void sendHeaderEvent(String body, String topic) {
+		Event event = EventBuilder.withBody(body, Charset.forName("utf-8"));
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("topic", topic);
+		event.setHeaders(map);
+		try {
+			rpcClient.append(event);
+		} catch (EventDeliveryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(String[] args) {
-		RpcClientFlume cFlume = new RpcClientFlume("centos131",44444);
-		cFlume.sendEvent("asdfgh");
-		cFlume.sendEvent("zxcvb");
+		RpcClientFlume cFlume = new RpcClientFlume("centos131", 44444);
+		//cFlume.sendEvent("asdfgh");
+		//cFlume.sendEvent("zxcvb");
+		
+		cFlume.sendHeaderEvent("qwert", "t1");
+		cFlume.sendHeaderEvent("poiuy", "t1");
+		cFlume.sendHeaderEvent("mnbv", "t2");
+		cFlume.sendHeaderEvent("lkjh", "t2");
+		
 		cFlume.rpcClient.close();
 	}
 }
